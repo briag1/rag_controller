@@ -1,17 +1,19 @@
+from __future__ import annotations
 import json
 import pathlib
 
-from __future__ import annotations
+
 from pydantic.dataclasses import dataclass
 from pydantic import Field
 from typing import Optional
 from datasets import Dataset
 
-@dataclass
 class RAGDataset:
     documents: list[str] 
     qa_dataset: Dataset
-    
+    def __init__(self, qa_dataset: Dataset, documents: list[str])-> None:
+        self.qa_dataset = qa_dataset
+        self.documents = documents
     @classmethod
     def build_rag_dataset(cls, dataset_name: str, path_raw_data: str)-> RAGDataset:
         match dataset_name:

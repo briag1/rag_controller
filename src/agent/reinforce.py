@@ -37,13 +37,14 @@ class Reinforce(Agent):
         pass
 
     def act(self, obs: np.ndarray, explore: bool):
-        ### PUT YOUR CODE HERE ###
-        raise NotImplementedError("Needed for Q3")
+        self.policy
 
     def update(
-        self, rewards: List[float], observations: List[np.ndarray], actions: List[int],
+        self, rewards: List[float], observations: List[str], actions: List[int],
         ) -> Dict[str, float]:
-        ### PUT YOUR CODE HERE ###
-        raise NotImplementedError("Needed for Q3")
-        p_loss = 0.0
+        current_return = 0
+        output = self.policy(observations)
+        for reward, obs, action in zip(reversed(rewards), reversed(observations), reversed(actions)):
+            current_return = self.gamma * current_return + reward
+            prob = [action]
         return {"p_loss": p_loss}
