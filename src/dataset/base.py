@@ -2,6 +2,7 @@ from __future__ import annotations
 import json
 import pathlib
 import subprocess
+import os
 
 from pydantic.dataclasses import dataclass
 from pydantic import Field
@@ -26,7 +27,7 @@ class RAGDataset:
     @classmethod      
     def build_as_qa_dataset(cls, path_raw_data: str, tokenzer: PreTrainedTokenizer)->RAGDataset:
         
-        if path_raw_data is None: 
+        if os.path.isdir(path_raw_data): 
             cls.download_alce_data(path_raw_data)
         with pathlib.Path("{}/asqa_eval_gtr_top100_reranked_oracle.json".format(path_raw_data)).open() as data_file:
             data = json.load(data_file)
