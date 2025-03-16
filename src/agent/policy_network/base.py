@@ -2,55 +2,23 @@
 from torch import nn, Tensor
 from typing import Iterable
 # Load model directly
-from transformers import AutoTokenizer, AutoModel
-
+from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification
 
 import torch
 
-class FCNEncoder(nn.Module):
+class EncoderForClassification(nn.Module):
     
-    def __init__(self, dims: Iterable[int], output_activation: nn.Module = None, encoder_name: str= "sentence-transformers/paraphrase-MiniLM-L12-v2"):
-        """Create a network using ReLUs between layers and no activation at the end.
-
-        :param dims (Iterable[int]): tuple in the form of (IN_SIZE, HIDDEN_SIZE, HIDDEN_SIZE2,
-            ..., OUT_SIZE) for dimensionalities of layers
-        :param output_activation (nn.Module): PyTorch activation function to use after last layer
-        """
+    def __init__(self,num_actions:int, output_activation: nn.Module = None, encoder_name: str= "sentence-transformers/paraphrase-MiniLM-L12-v2"):
         super().__init__()
-        self.input_size = dims[0]
-        self.out_size = dims[-1]
-        self.layers = self.make_seq(dims, output_activation)
-        self.encoder = AutoModel.from_pretrained(encoder_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(encoder_name)
         
-    @staticmethod
-    def make_seq(dims: Iterable[int], output_activation: nn.Module) -> nn.Module:
-        """Create a sequential network using ReLUs between layers and no activation at the end.
 
-        :param dims (Iterable[int]): tuple in the form of (IN_SIZE, HIDDEN_SIZE, HIDDEN_SIZE2,
-            ..., OUT_SIZE) for dimensionalities of layers
-        :param output_activation (nn.Module): PyTorch activation function to use after last layer
-        :return (nn.Module): return created sequential layers
-        """
-        mods = []
-
-        for i in range(len(dims) - 2):
-            mods.append(nn.Linear(dims[i], dims[i + 1]))
-            mods.append(nn.ReLU())
-
-        mods.append(nn.Linear(dims[-2], dims[-1]))
-        if output_activation:
-            mods.append(output_activation())
-        return nn.Sequential(*mods)
-
-    def forward(self, x: Tensor) -> Tensor:
-        """Compute a forward pass through the network.
-
-        :param x (torch.Tensor): input tensor to feed into the network
-        :return (torch.Tensor): output computed by the network
-        """
+        self.encoder = AutoModelForSequenceClassification.from_pretrained(encoder_name, num_labels=num_actions, torch_dtype="auto")
+        self.tokenizer = AutoTokenizer.from_pretrained(encoder_name)                                                                                    
+        
+    def forward(self, input_ids: Tensor, attention_mask: Tensor) -> Tensor:
         # Feedforward
-        return self.layers(x)
+        return self.encoder(input_ids = inputs)
 
     def hard_update(self, source: nn.Module):
         """Update the network parameters by copying the parameters of another network.

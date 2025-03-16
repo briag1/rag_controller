@@ -3,10 +3,11 @@ from __future__ import annotations
 from typing import Optional
 import numpy as np
 import gymnasium as gym
-from datasets import Dataset
-
+from src.dataset.base import RAGDataset
+from src.model.rag.adaptative_top_k import AdaptiveTopKQueryEngine
+from src.env.rewarder.base import Rewarder
 class RAGEnv(gym.Env):
-    def __init__(self, dataset: Dataset, rewarder: Rewarder, embedding_model: str, llm: str,):
+    def __init__(self, dataset: RAGDataset, rewarder: Rewarder, embedding_model: str, llm: str,):
         super().__init__()
         self.dataset = dataset
         self.num_samples = len(dataset)
@@ -15,7 +16,7 @@ class RAGEnv(gym.Env):
         max_question_length = max(len(sample["question"]) for sample in dataset)
         self.observation_space = gym.spaces.Text(max_length=max_question_length)
         self.action_space = gym.spaces.Discrete(4)  # top_k values: {1, 3, 5, 10, 20}
-        self.rag = AdaptiveTopKQueryEngine.build(documents_texts_dict, embedding_model, llm)
+        self.rag = AdaptiveTopKQueryEngine.build(dataset.documents, embedding_model, llm)
         self.current_index = 0  # Random question index
         self.rewarder = rewarder
 

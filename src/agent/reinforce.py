@@ -1,5 +1,9 @@
 import gymnasium as gym
 from typing import Dict, Iterable, List
+from src.agent.base import Agent
+from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification
+from torch.optim import Adam
 
 class Reinforce(Agent):
 
@@ -8,20 +12,17 @@ class Reinforce(Agent):
         action_space: gym.Space,
         observation_space: gym.Space,
         learning_rate: float,
-        hidden_size: Iterable[int],
+        encoder_name,
         gamma: float,
         **kwargs,
         )-> None:
         
         super().__init__(action_space, observation_space)
         STATE_SIZE = observation_space.shape[0]
-        ACTION_SIZE = action_space.n
-
-        self.policy = FCNetwork(
-            (STATE_SIZE, *hidden_size, ACTION_SIZE), output_activation=torch.nn.modules.activation.Softmax
-            )
-
-        self.policy_optim = Adam(self.policy.parameters(), lr=learning_rate, eps=1e-3)
+        num_actions = action_space.n
+        
+        self.encoder = AutoModelForSequenceClassification.from_pretrained(encoder_name, num_labels=num_actions, torch_dtype="auto")
+        self.encoder_optim = Adam(self.encoder.parameters(), lr=learning_rate, eps=1e-3)
 
 
         self.learning_rate = learning_rate
@@ -29,14 +30,14 @@ class Reinforce(Agent):
 
         self.saveables.update(
             {
-                "policy": self.policy,
+                "policy": self.encoder,
                 }
             )
 
     def schedule_hyperparameters(self, timestep: int, max_timesteps: int) -> None:
         pass
 
-    def act(self, obs: np.ndarray, explore: bool):
+    def act(self, obs: str, explore: bool):
         self.policy
 
     def update(

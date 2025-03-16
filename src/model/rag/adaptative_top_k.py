@@ -12,8 +12,8 @@ from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core import VectorStoreIndex
 from llama_index.core import Document
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from src.model.text_2_text_models.llm_agent import LLMAgent
 
-from src.
 
 DEFAULT_TEXT_QA_PROMPT_TMPL = (
     "Answer factoid (answer can be short i.e keyword only) and ambiguous query below:\n"
@@ -56,7 +56,7 @@ class AdaptiveTopKQueryEngine(CustomQueryEngine):
           embed_model=embedding_model,
           similarity_top_k=50)
 
-    agent = LLMAgent(name)
+    agent = LLMAgent(llm_name)
     rag = AdaptiveTopKQueryEngine(
           retriever=retriever,
           llm=agent
