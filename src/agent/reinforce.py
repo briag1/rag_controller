@@ -33,14 +33,14 @@ class Reinforce(Agent):
         pass
 
     def act(self, obs: dict, explore: bool):
-        with torch.no_grad:
-            logits: torch.Tensor = self.encoder(input_ids = obs["input_ids"], attention_mask = obs["attention_mask"]).logits
+        with torch.no_grad():
+            logits: torch.Tensor = self.encoder(input_ids = obs["input_ids"].unsqueeze(0), attention_mask = obs["attention_mask"].unsqueeze(0)).logits
         probs = logits.softmax(dim=-1)
         if explore:
             sampled_id = probs.multinomial(num_samples=1, replacement = True)
         else:
             sampled_id = probs.argmax(dim=-1)
-        return sampled_id
+        return sampled_id.item()
 
     def update(
         self, rewards: List[float], observations: List[str], actions: List[int],
@@ -48,7 +48,10 @@ class Reinforce(Agent):
         current_return = 0
         for reward, obs, action in zip(reversed(rewards), reversed(observations), reversed(actions)):
             current_return = self.gamma * current_return + reward
-            prob = self.encoder(self.obs)[action]
+            prob = self.encoder(input_ids = obs["input_ids"].unsqueeze(0), attention_mask = obs["attention_mask"].unsqueeze(0)).logits.softmax(1)[action]
             p_loss += torch.log(prob)*current_return
         p_loss = -1/len(rewards)*p_loss
-        return {"p_loss": p_loss}
+        p_loss.backward()
+        self.encoder_optim.step()
+        self.encoder_optim.zero_grad()
+        return {"p_loss": p_loss.item()}

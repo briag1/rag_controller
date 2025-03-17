@@ -42,7 +42,7 @@ class RAGDataset:
             return {"answer": answers}
         new_ds = dataset.map(add_answers, remove_columns=["qa_pairs", "wikipages","annotations","sample_id", "docs"])
         tokenized_dataset = cls.tokenize_dataset(tokenzer, new_ds)
-        
+        tokenized_dataset.set_format("torch")
         return RAGDataset(documents = documents_texts_dict, qa_dataset=tokenized_dataset)
     
     @classmethod
