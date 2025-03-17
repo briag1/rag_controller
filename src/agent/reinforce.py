@@ -16,8 +16,7 @@ class Reinforce(Agent):
         gamma: float,
         **kwargs,
         )-> None:
-
-        
+        super().__init__()
         self.tokenizer = AutoTokenizer.from_pretrained("answerdotai/ModernBERT-base")
         self.encoder = AutoModelForSequenceClassification.from_pretrained(encoder_name, num_labels=num_actions, torch_dtype="auto")
         self.encoder_optim = Adam(self.encoder.parameters(), lr=learning_rate, eps=1e-3)
