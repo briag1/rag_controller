@@ -10,6 +10,7 @@ from src.agent.base import Agent
 class Trainer:
     def __init__(self, render:bool= False) -> None:
         self.render = render
+        
     
     def play_episode(
         self,

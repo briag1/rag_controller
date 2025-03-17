@@ -3,28 +3,24 @@ from typing import Dict, Iterable, List
 from src.agent.base import Agent
 from transformers import AutoTokenizer
 from transformers import AutoModelForSequenceClassification
+import torch
 from torch.optim import Adam
 
 class Reinforce(Agent):
 
     def __init__(
         self,
-        action_space: gym.Space,
-        observation_space: gym.Space,
+        num_actions: int,
         learning_rate: float,
         encoder_name,
         gamma: float,
         **kwargs,
         )-> None:
+
         
-        super().__init__(action_space, observation_space)
-        STATE_SIZE = observation_space.shape[0]
-        num_actions = action_space.n
-        
+        self.tokenizer = AutoTokenizer.from_pretrained("answerdotai/ModernBERT-base")
         self.encoder = AutoModelForSequenceClassification.from_pretrained(encoder_name, num_labels=num_actions, torch_dtype="auto")
         self.encoder_optim = Adam(self.encoder.parameters(), lr=learning_rate, eps=1e-3)
-
-
         self.learning_rate = learning_rate
         self.gamma = gamma
 
@@ -37,8 +33,13 @@ class Reinforce(Agent):
     def schedule_hyperparameters(self, timestep: int, max_timesteps: int) -> None:
         pass
 
-    def act(self, obs: str, explore: bool):
-        self.policy
+    def act(self, obs: dict, explore: bool):
+        with torch.no_grad:
+            logits: torch.Tensor = self.encoder(input_ids = obs["input_ids"], attention_mask = obs["attention_mask"]).logits
+        if explore:
+            indices = np.arange(logits)
+            
+        logits.softmax(dim = 1)
 
     def update(
         self, rewards: List[float], observations: List[str], actions: List[int],

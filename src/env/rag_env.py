@@ -9,11 +9,10 @@ from src.env.rewarder.base import Rewarder
 class RAGEnv(gym.Env):
     def __init__(self, dataset: RAGDataset, rewarder: Rewarder, embedding_model: str, llm: str,):
         super().__init__()
-        self.dataset = dataset
-        self.num_samples = len(dataset)
-
+        self.dataset = dataset.qa_dataset
+        self.num_samples = len(self.dataset)
         # Define observation and action spaces
-        max_question_length = max(len(sample["question"]) for sample in dataset)
+        max_question_length = max(len(sample["question"]) for sample in self.dataset)
         self.observation_space = gym.spaces.Text(max_length=max_question_length)
         self.action_space = gym.spaces.Discrete(4)  # top_k values: {1, 3, 5, 10, 20}
         self.rag = AdaptiveTopKQueryEngine.build(dataset.documents, embedding_model, llm)
@@ -23,7 +22,7 @@ class RAGEnv(gym.Env):
     def reset(self, seed: Optional[int] = None, options: Optional[dict] = None):
         super().reset(seed=seed)
         self.current_index = np.random.randint(0, self.num_samples)  # Random question index
-        observation = self.dataset[self.current_index]["question"]
+        observation = self.dataset[self.current_index]
         return observation, {}
 
 

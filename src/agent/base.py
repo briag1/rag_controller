@@ -14,9 +14,7 @@ import random
 
 class Agent(ABC):
     
-    def __init__(self, action_space: gym.Space, observation_space: gym.Space)-> None:
-        self.action_space = action_space
-        self.observation_space = observation_space
+    def __init__(self)-> None:
 
         self.saveables = {}
 

@@ -27,7 +27,7 @@ class RAGDataset:
     @classmethod      
     def build_as_qa_dataset(cls, path_raw_data: str, tokenzer: PreTrainedTokenizer)->RAGDataset:
         
-        if os.path.isdir(path_raw_data): 
+        if not os.path.isdir(path_raw_data): 
             cls.download_alce_data(path_raw_data)
         with pathlib.Path("{}/asqa_eval_gtr_top100_reranked_oracle.json".format(path_raw_data)).open() as data_file:
             data = json.load(data_file)
@@ -46,7 +46,7 @@ class RAGDataset:
         return RAGDataset(documents = documents_texts_dict, qa_dataset=tokenized_dataset)
     
     @classmethod
-    def tokenize_dataset(tokenizer: PreTrainedTokenizer, qa_dataset: Dataset) -> Dataset:
+    def tokenize_dataset(cls, tokenizer: PreTrainedTokenizer, qa_dataset: Dataset) -> Dataset:
         return qa_dataset.map(lambda example: tokenizer(example["question"], truncation=True))
         
     @classmethod
