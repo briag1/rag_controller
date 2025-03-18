@@ -46,11 +46,14 @@ class Reinforce(Agent):
         self, rewards: List[float], observations: List[str], actions: List[int],
         ) -> Dict[str, float]:
         current_return = 0
-        for reward, obs, action in zip(reversed(rewards), reversed(observations), reversed(actions)):
+        p_loss = 0
+        for idx, (reward, obs, action) in enumerate(zip(reversed(rewards), reversed(observations), reversed(actions))):
+            if idx ==0: 
+                continue
             current_return = self.gamma * current_return + reward
             prob = self.encoder(input_ids = obs["input_ids"].unsqueeze(0), attention_mask = obs["attention_mask"].unsqueeze(0)).logits.softmax(1)[action]
             p_loss += torch.log(prob)*current_return
-        p_loss = -1/len(rewards)*p_loss
+        p_loss = -1/(len(rewards)-1)*p_loss
         p_loss.backward()
         self.encoder_optim.step()
         self.encoder_optim.zero_grad()

@@ -37,8 +37,8 @@ class Trainer:
         rewards = []
 
         while not done and num_steps < max_steps:
-            action = agent.act(np.array(obs), explore=explore)
-            nobs, rew, done, _ = env.step(action)
+            action = agent.act(obs, explore=explore)
+            nobs, rew, done, truncated, info = env.step(action)
 
             observations.append(obs)
             actions.append(action)
