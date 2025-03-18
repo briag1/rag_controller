@@ -48,7 +48,6 @@ class AdaptiveTopKQueryEngine(CustomQueryEngine):
 
   @classmethod
   def build(cls, documents_texts_dict: dict[int,str], embedding_model_name: str, llm_name: str)-> AdaptiveTopKQueryEngine:
-    documents = [{"text": text, "id": doc_id} for doc_id, text in documents_texts_dict.items()]
     embedding_model = HuggingFaceEmbedding(model_name=embedding_model_name, embed_batch_size=64)
     index = VectorStoreIndex.from_documents([Document(text = doc) for doc in documents_texts_dict.values()], embed_model= embedding_model)
     retriever = VectorIndexRetriever(

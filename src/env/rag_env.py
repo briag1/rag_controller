@@ -37,6 +37,7 @@ class RAGEnv(gym.Env):
 
         # Get retrieved documents and compute relevance
         answer = self.rag.query_with_config(question, top_k)
+        print("RAG answer:", answer)
         info = {"answer": answer, "reference_answer": reference_answer}
         # Compute reward
         reward, rewarder_info = self.rewarder.reward(answer, reference_answer)
