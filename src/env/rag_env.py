@@ -30,14 +30,11 @@ class RAGEnv(gym.Env):
         """Given an action (top_k selection), compute the reward based on retrieved documents."""
         question = self.dataset[self.current_index]["question"]
         reference_answer = self.dataset[self.current_index]["answer"]
-
         # Convert action index to top_k value: {0 → 1, 1 → 3, 2 → 5, 3 → 10, 4 → 20}
         #top_k_values = 
         top_k = action
-
         # Get retrieved documents and compute relevance
         answer = self.rag.query_with_config(question, top_k)
-        print("RAG answer:", answer)
         info = {"answer": answer, "reference_answer": reference_answer}
         # Compute reward
         reward, rewarder_info = self.rewarder.reward(answer, reference_answer)

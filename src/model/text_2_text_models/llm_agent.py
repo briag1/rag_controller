@@ -18,7 +18,6 @@ class LLMAgent:
     inputs = self.tokenizer.encode(input_text, return_tensors="pt").to(self.device)
     outputs = self.llm.generate(inputs, max_new_tokens=50, temperature=0.2, top_p=0.9, do_sample=True)
     response = self.tokenizer.decode(outputs[0])
-    print(outputs)
     parsed_response = self.parse_output(response)
     return parsed_response
 

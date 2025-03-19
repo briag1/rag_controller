@@ -38,8 +38,10 @@ class Reinforce(Agent):
         probs = logits.softmax(dim=-1)
         if explore:
             sampled_id = probs.multinomial(num_samples=1, replacement = True)
+            
         else:
             sampled_id = probs.argmax(dim=-1)
+        print(sampled_id)
         return sampled_id.item()
 
     def update(
@@ -47,7 +49,7 @@ class Reinforce(Agent):
         ) -> Dict[str, float]:
         current_return = 0
         p_loss = 0
-        for (reward, obs, action) in zip(reversed(rewards), reversed(observations[:-1]), reversed(actions)):
+        for (reward, obs, action) in zip(reversed(rewards), reversed(observations), reversed(actions)):
             current_return = self.gamma * current_return + reward
             prob = self.encoder(input_ids = obs["input_ids"].unsqueeze(0), attention_mask = obs["attention_mask"].unsqueeze(0)).logits.softmax(1).squeeze()[action]
             p_loss += torch.log(prob)* current_return

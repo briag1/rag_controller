@@ -23,7 +23,7 @@ class Trainer:
         ) -> Tuple[int, float, Dict]:
         
         ep_data = defaultdict(list)
-        obs = env.reset()
+        obs, _ = env.reset()
 
         if render:
             env.render()
