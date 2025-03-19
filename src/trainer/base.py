@@ -100,10 +100,7 @@ class Trainer:
 
                 if timesteps_elapsed % config["eval_freq"] < num_steps:
                     eval_return = 0
-                    if config["env"] == "CartPole-v1" or config["env"] == "Acrobot-v1":
-                        max_steps = config["episode_length"]
-                    else:
-                        raise ValueError(f"Unknown environment {config['env']}")
+                    max_steps = config["episode_length"]
 
                     for _ in range(config["eval_episodes"]):
                         _, total_reward, _ = self.play_episode(
