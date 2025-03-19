@@ -22,7 +22,9 @@ class LLMAgent:
     return parsed_response
 
   def parse_output(self, output: str) -> str:
-    matches = re.findall(r"<\|im_start\|>(.*?)<\|im_end\|>", output, re.DOTALL)
+    matches = output.split(r"<|im_start|>")
+    matches = [content.replace("<|im_end|>", "") for content in matches if len(content.replace("<|im_end|>", "")) >0]
+    #matches = re.findall(r"<\|im_start\|>(.*?)<\|im_end\|>", output, re.DOTALL)
 
     parsed_data = {}
     for match in matches:

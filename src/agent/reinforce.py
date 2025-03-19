@@ -33,9 +33,12 @@ class Reinforce(Agent):
         pass
 
     def act(self, obs: dict, explore: bool):
+        print("explore: ", explore)
         with torch.no_grad():
             logits: torch.Tensor = self.encoder(input_ids = obs["input_ids"].unsqueeze(0), attention_mask = obs["attention_mask"].unsqueeze(0)).logits
         probs = logits.softmax(dim=-1)
+        
+        print("probs: ", probs)
         if explore:
             sampled_id = probs.multinomial(num_samples=1, replacement = True)
             
